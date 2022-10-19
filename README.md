@@ -6,6 +6,7 @@
 4. docker-compose run app php artisan migrate
 5. docker-compose run app php artisan db:seed
 
+### Use 
 - GET http://localhost:8000/api/comments - List
 - POST http://localhost:8000/api/comments - Create, e.g. `{"name":"Sally", "message": "Hi there"}`
 - PATCH http://localhost:8000/api/comments/23 - Edit, e.g. `{"name":"Sally", "message": "Hi there"}`
