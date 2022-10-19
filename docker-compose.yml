@@ -1,0 +1,61 @@
+version: "3.7"
+services:
+    app:
+        build:
+            args:
+                user: alex
+                uid: 1000
+            context: ./
+            dockerfile: Dockerfile
+        image: blog-post
+        container_name: blog-post-app
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        networks:
+            - blog-post
+
+    db:
+        image: mysql:8.0
+        container_name: blog-post-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        command: --init-file /data/application/init.sql
+        volumes:
+            - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+            - ./init.sql:/data/application/init.sql
+        networks:
+            - blog-post
+    db-test:
+        image: mysql:8.0
+        container_name: blog-post-db-test
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+        networks:
+            - blog-post
+    nginx:
+        image: nginx:alpine
+        container_name: blog-post-nginx
+        restart: unless-stopped
+        ports:
+            - 8000:80
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d/
+        networks:
+            - blog-post
+
+networks:
+    blog-post:
+        driver: bridge
